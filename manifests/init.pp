@@ -8,6 +8,7 @@ class slack (
   $slack_puppet_reports = undef,
   $slack_puppet_dir     = '/etc/puppet',
   $is_puppetmaster      = true,
+  $foreman_url          = undef,
 ) {
   
   anchor {'slack::begin':}

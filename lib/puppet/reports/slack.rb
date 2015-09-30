@@ -16,9 +16,10 @@ Puppet::Reports.register_report(:slack) do
   SLACK_BOTNAME = @config[:slack_botname]
   SLACK_ICONURL = @config[:slack_iconurl]
   SLACK_URL = @config[:slack_url]
+  FOREMAN_URL = @config[:foreman_url]
 
   def process
-    if self.status == "failed" or self.status == "changed"
+    if self.status == "failed"
       Puppet.debug "Sending status for #{self.host} to Slack."
       conn = Faraday.new(:url => "#{SLACK_URL}") do |faraday|
           faraday.request  :url_encoded
@@ -27,7 +28,7 @@ Puppet::Reports.register_report(:slack) do
 
       conn.post do |req|
           req.url "/services/hooks/incoming-webhook?token=#{SLACK_TOKEN}"
-          req.body = "{\"channel\":\"#{SLACK_CHANNEL}\",\"username\":\"#{SLACK_BOTNAME}\", \"icon_url\":\"#{SLACK_ICONURL}\",\"text\":\"> Puppet run for #{self.host} `#{self.status}` at #{Time.now.asctime}\"}"
+          req.body = "{\"channel\":\"#{SLACK_CHANNEL}\",\"username\":\"#{SLACK_BOTNAME}\", \"icon_url\":\"#{SLACK_ICONURL}\",\"text\":\"> Puppet run for <#{FOREMAN_URL}/hosts/#{self.host}/reports|#{self.host}> #{self.status} at #{Time.now.asctime}\"}"
       end
     end
   end
